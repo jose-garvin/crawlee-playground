@@ -12,6 +12,7 @@ help: ##@miscellaneous Show this help
 	@echo "  make install          - Install dependencies (in Docker)"
 	@echo "  make build            - Build TypeScript project (in Docker)"
 	@echo "  make benchmark        - Run both Playwright and Cheerio benchmarks (in Docker)"
+	@echo "                        Example: make benchmark ARGS=\"--scenario simple-static\""
 	@echo "  make benchmark-playwright - Run only Playwright benchmark (in Docker)"
 	@echo "  make benchmark-cheerio - Run only Cheerio benchmark (in Docker)"
 	@echo "  make compare          - Compare latest benchmark results"
@@ -38,14 +39,26 @@ install: docker-ensure ##@setup Install dependencies
 build: docker-ensure ##@setup Build TypeScript project
 	docker-compose exec ${SERVICE} npm run build
 
-benchmark: docker-ensure ##@benchmark Run both Playwright and Cheerio benchmarks
-	docker-compose exec ${SERVICE} npm run benchmark
+benchmark: docker-ensure ##@benchmark Run both Playwright and Cheerio benchmarks (usage: make benchmark ARGS="--scenario simple-static")
+	@if [ -z "$(ARGS)" ]; then \
+		docker-compose exec ${SERVICE} npm run benchmark; \
+	else \
+		docker-compose exec ${SERVICE} sh -c "npm run benchmark -- $(ARGS)"; \
+	fi
 
-benchmark-playwright: docker-ensure ##@benchmark Run only Playwright benchmark
-	docker-compose exec ${SERVICE} npm run benchmark:playwright
+benchmark-playwright: docker-ensure ##@benchmark Run only Playwright benchmark (usage: make benchmark-playwright ARGS="--scenario simple-static")
+	@if [ -z "$(ARGS)" ]; then \
+		docker-compose exec ${SERVICE} npm run benchmark:playwright; \
+	else \
+		docker-compose exec ${SERVICE} sh -c "npm run benchmark:playwright -- $(ARGS)"; \
+	fi
 
-benchmark-cheerio: docker-ensure ##@benchmark Run only Cheerio benchmark
-	docker-compose exec ${SERVICE} npm run benchmark:cheerio
+benchmark-cheerio: docker-ensure ##@benchmark Run only Cheerio benchmark (usage: make benchmark-cheerio ARGS="--scenario simple-static")
+	@if [ -z "$(ARGS)" ]; then \
+		docker-compose exec ${SERVICE} npm run benchmark:cheerio; \
+	else \
+		docker-compose exec ${SERVICE} sh -c "npm run benchmark:cheerio -- $(ARGS)"; \
+	fi
 
 compare: ##@benchmark Compare latest benchmark results
 	@if [ -z "$$(ls -A results/*.json 2>/dev/null)" ]; then \

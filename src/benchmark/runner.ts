@@ -10,6 +10,7 @@ import type { BenchmarkConfig, BenchmarkResult, BenchmarkMetrics } from "../type
 import { generateReport } from "./reporter.js";
 import { writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
+import { SCENARIOS, getScenario, type TestScenario } from "../scenarios/basic.js";
 
 const program = new Command();
 
@@ -35,6 +36,8 @@ program
   .option("-i, --iterations <number>", "Number of iterations", defaultIterations)
   .option("-t, --timeout <number>", "Timeout in milliseconds", defaultTimeout)
   .option("-c, --crawler <type>", "Crawler type: playwright, cheerio, or both", defaultCrawler)
+  .option("-s, --scenario <name>", "Use predefined scenario (simple-static, medium-site, documentation)")
+  .option("--list-scenarios", "List all available scenarios and exit")
   .parse(process.argv);
 
 const options = program.opts();
@@ -166,10 +169,24 @@ async function runBenchmark(
  * Run all benchmarks
  */
 async function runBenchmarks() {
+  // Check if a scenario is specified
+  let scenario: TestScenario | undefined;
+  if (options.scenario) {
+    scenario = getScenario(options.scenario);
+    if (!scenario) {
+      console.error(`Error: Scenario "${options.scenario}" not found.`);
+      console.error(`Available scenarios: ${SCENARIOS.map((s) => s.name).join(", ")}`);
+      console.error(`Use --list-scenarios to see all available scenarios.`);
+      process.exit(1);
+    }
+    console.log(`\nUsing scenario: ${scenario.name}`);
+    console.log(`Description: ${scenario.description}`);
+  }
+
   const config: BenchmarkConfig = {
-    url: options.url,
-    maxPages: parseInt(options.maxPages, 10),
-    maxDepth: parseInt(options.maxDepth, 10),
+    url: scenario?.url || options.url,
+    maxPages: scenario?.maxPages || parseInt(options.maxPages, 10),
+    maxDepth: scenario?.maxDepth || parseInt(options.maxDepth, 10),
     iterations: parseInt(options.iterations, 10),
     timeout: parseInt(options.timeout, 10),
   };

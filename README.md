@@ -75,28 +75,39 @@ cp .env.example .env
 # Run both Playwright and Cheerio benchmarks (uses .env defaults)
 make benchmark
 
-# Run only Playwright
-make benchmark-playwright
+# Run with a specific scenario
+make benchmark ARGS="--scenario simple-static"
 
-# Run only Cheerio
-make benchmark-cheerio
+# Run with custom options (overrides .env values)
+make benchmark ARGS="--url https://example.com --max-pages 20 --iterations 3"
 
-# Custom benchmark with options (overrides .env values)
-npm run benchmark -- --url https://example.com --max-pages 20 --iterations 3
+# List all available scenarios
+make benchmark ARGS="--list-scenarios"
+
+# Run only Playwright with a scenario
+make benchmark-playwright ARGS="--scenario medium-site"
+
+# Run only Cheerio with a scenario
+make benchmark-cheerio ARGS="--scenario documentation"
 ```
 
 ### Command Line Options
 
+All options can be passed using the `ARGS` variable with `make benchmark`:
+
 ```bash
-npm run benchmark -- [options]
+make benchmark ARGS="[options]"
+```
 
 Options:
-  -u, --url <url>              URL to crawl (default: https://example.com)
-  -p, --max-pages <number>     Maximum pages to crawl (default: 10)
-  -d, --max-depth <number>      Maximum crawl depth (default: 2)
-  -i, --iterations <number>     Number of iterations (default: 1)
-  -t, --timeout <number>       Timeout in milliseconds (default: 30000)
-  -c, --crawler <type>         Crawler type: playwright, cheerio, or both (default: both)
+  -u, --url <url>              URL to crawl (default: from .env or https://example.com)
+  -p, --max-pages <number>     Maximum pages to crawl (default: from .env or 10)
+  -d, --max-depth <number>      Maximum crawl depth (default: from .env or 2)
+  -i, --iterations <number>     Number of iterations (default: from .env or 1)
+  -t, --timeout <number>       Timeout in milliseconds (default: from .env or 30000)
+  -c, --crawler <type>         Crawler type: playwright, cheerio, or both (default: from .env or both)
+  -s, --scenario <name>        Use predefined scenario (simple-static, medium-site, documentation)
+  --list-scenarios             List all available scenarios and exit
 ```
 
 ### Using Docker
@@ -178,11 +189,31 @@ Speedup: 2.80x (Cheerio faster)
 
 ## Test Scenarios
 
-Predefined test scenarios are available in `tests/scenarios/basic.ts`:
+Predefined test scenarios are available in `src/scenarios/basic.ts`. These scenarios provide pre-configured URLs and settings for common benchmarking use cases.
 
-- `simple-static`: Simple static website
-- `medium-site`: Medium complexity site
-- `documentation`: Documentation site with structured content
+### Available Scenarios
+
+- `simple-static`: Simple static website with minimal JavaScript (example.com)
+- `medium-site`: Medium complexity site with multiple pages (httpbin.org)
+- `documentation`: Documentation site with structured content (crawlee.dev)
+
+### Using Scenarios
+
+```bash
+# List all available scenarios
+make benchmark ARGS="--list-scenarios"
+
+# Run benchmark with a specific scenario
+make benchmark ARGS="--scenario simple-static"
+
+# Run benchmark with a scenario and override iterations
+make benchmark ARGS="--scenario medium-site --iterations 3"
+
+# Run benchmark with a scenario and custom URL override
+make benchmark ARGS="--scenario documentation --max-pages 15"
+```
+
+Scenarios automatically set the URL, max pages, and max depth. You can still override individual parameters if needed.
 
 ## Development
 
@@ -194,7 +225,7 @@ Predefined test scenarios are available in `tests/scenarios/basic.ts`:
 
 ### Adding New Scenarios
 
-Edit `tests/scenarios/basic.ts` to add new test scenarios:
+Edit `src/scenarios/basic.ts` to add new test scenarios:
 
 ```typescript
 export const SCENARIOS: TestScenario[] = [
