@@ -1,0 +1,40 @@
+{
+  "name": "crawlee-playgrounds",
+  "version": "1.0.0",
+  "description": "Benchmarking project to compare Crawlee with Playwright vs Cheerio",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "benchmark": "tsx src/benchmark/runner.ts",
+    "benchmark:playwright": "tsx src/benchmark/runner.ts --crawler playwright",
+    "benchmark:cheerio": "tsx src/benchmark/runner.ts --crawler cheerio",
+    "build": "tsc",
+    "lint": "eslint . --ext .ts",
+    "start": "tsx src/index.ts"
+  },
+  "keywords": [
+    "crawlee",
+    "playwright",
+    "cheerio",
+    "benchmark",
+    "web-scraping"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "crawlee": "^3.15.1",
+    "playwright": "^1.56.1",
+    "cheerio": "^1.0.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.12",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint": "^9.38.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
+

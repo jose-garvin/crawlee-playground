@@ -1,0 +1,21 @@
+services:
+  benchmark:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: crawlee-benchmark
+    volumes:
+      - ./results:/app/results
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./.env:/app/.env:ro
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    # Keep container running for exec commands
+    command: tail -f /dev/null
+    stdin_open: true
+    tty: true
+
